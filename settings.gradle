@@ -1,0 +1,2 @@
+include ':app', ':wsgo-lib'
+rootProject.name='ws-go'
