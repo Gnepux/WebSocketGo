@@ -18,8 +18,6 @@ import okhttp3.WebSocketListener;
 import okhttp3.internal.Util;
 import okhttp3.internal.ws.RealWebSocket;
 
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
-
 public class OkWebSocket implements WebSocket {
 
     private okhttp3.WebSocket mWebSocket;
@@ -30,9 +28,9 @@ public class OkWebSocket implements WebSocket {
 
     @Override
     public void connect(WsConfig config, final ChannelCallback callback) {
-        Request request = OkUtils.generateRequest(config.mHeaders, config.mUrl);
-        OkHttpClient client = OkUtils.generateClient(config.mPingInterval, config.mConnectTimeout,
-                config.mReadTimeout, config.mWriteTimeout);
+        Request request = OkUtils.generateRequest(config.httpHeaders, config.url);
+        OkHttpClient client = OkUtils.generateClient(config.pingInterval, config.connectTimeout,
+                config.readTimeout, config.writeTimeout);
 
         if (client == null) {
             return;
@@ -64,6 +62,11 @@ public class OkWebSocket implements WebSocket {
                 callback.onDisconnect(t);
             }
         });
+    }
+
+    @Override
+    public void reconnect(WsConfig config, final ChannelCallback callback) {
+        connect(config, callback);
     }
 
     @Override

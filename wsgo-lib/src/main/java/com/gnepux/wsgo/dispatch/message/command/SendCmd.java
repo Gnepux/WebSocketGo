@@ -1,5 +1,8 @@
 package com.gnepux.wsgo.dispatch.message.command;
 
+/**
+ * @author gnepux
+ */
 public class SendCmd extends Command {
 
     private String text;

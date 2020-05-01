@@ -5,7 +5,9 @@ import com.gnepux.wsgo.dispatch.queue.MessageQueue;
 import com.gnepux.wsgo.dispatch.resolver.Resolver;
 
 /**
- * Implementation of Consumer Thread
+ * Consumer thread.
+ *
+ * @author gnepux
  */
 public class ConsumerThread<E extends Message> extends Thread implements Consumer<E> {
 
@@ -26,12 +28,15 @@ public class ConsumerThread<E extends Message> extends Thread implements Consume
     public void run() {
         while (isAlive) {
             E e = queue.poll();
-            handleMessage(e);
+            if (e != null) {
+                handleMessage(e);
+            }
         }
     }
 
     public void shutdown() {
         isAlive = false;
+        interrupt();
     }
 
     @Override

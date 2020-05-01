@@ -1,29 +1,20 @@
 package com.gnepux.wsgo;
 
-public abstract class EventListener {
+/**
+ * @author gnepux
+ */
+public interface EventListener {
 
-    public void onConnect() {
+    void onConnect();
 
-    }
+    void onDisConnect();
 
-    public void onDisConnect() {
+    void onClose();
 
-    }
+    void onMessage(String text);
 
-    public void onClose() {
+    void onRetry(long retryCount, long delayMillSec);
 
-    }
-
-    public void onMessage(String text) {
-
-    }
-
-    public void onRetry(int retryCount, long delayMillSec) {
-
-    }
-
-    public void onSend(boolean success) {
-
-    }
+    void onSend(boolean success);
 
 }

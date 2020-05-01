@@ -2,6 +2,9 @@ package com.gnepux.wsgo.dispatch.message.event;
 
 import com.gnepux.wsgo.dispatch.message.Message;
 
+/**
+ * @author gnepux
+ */
 public class Event extends Message {
 
     private static final int BASE = 1;

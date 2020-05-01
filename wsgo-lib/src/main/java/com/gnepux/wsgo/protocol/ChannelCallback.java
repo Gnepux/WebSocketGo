@@ -1,7 +1,9 @@
 package com.gnepux.wsgo.protocol;
 
 /**
- * WebSocket callbacks
+ * WsGo Client callback. Custom WebSocket library should call the callback.
+ *
+ * @author gnepux
  */
 public interface ChannelCallback {
 

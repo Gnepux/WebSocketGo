@@ -2,6 +2,9 @@ package com.gnepux.wsgo.dispatch.message.command;
 
 import com.gnepux.wsgo.WsConfig;
 
+/**
+ * @author gnepux
+ */
 public class ConnectCmd extends Command {
 
     private WsConfig config;

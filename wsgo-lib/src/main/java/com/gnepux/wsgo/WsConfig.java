@@ -2,7 +2,9 @@ package com.gnepux.wsgo;
 
 import com.gnepux.wsgo.protocol.WebSocket;
 import com.gnepux.wsgo.protocol.okhttp.OkWebSocket;
+import com.gnepux.wsgo.retry.DefaultRetryStrategy;
 import com.gnepux.wsgo.retry.RetryStrategy;
+import com.gnepux.wsgo.util.WsGoLog;
 
 import java.util.HashMap;
 
@@ -11,78 +13,168 @@ import static com.gnepux.wsgo.constant.Constants.DEFAULT_PING_INTERVAL;
 import static com.gnepux.wsgo.constant.Constants.DEFAULT_READ_TIMEOUT;
 import static com.gnepux.wsgo.constant.Constants.DEFAULT_WRITE_TIMEOUT;
 
+/**
+ * WsGo config
+ *
+ * @author gnepux
+ */
 public class WsConfig {
 
-    public WebSocket mWebSocket = null;
+    /**
+     * WebSocket url
+     */
+    public String url;
 
-    public EventListener mEventListener = null;
+    /**
+     * Http headers
+     */
+    public HashMap<String, String> httpHeaders;
 
-    public long mPingInterval = DEFAULT_PING_INTERVAL;
+    /**
+     * The WebSocket client that WsGo used, must implement {@link WebSocket} interface
+     */
+    public WebSocket websocket;
 
-    public long mConnectTimeout = DEFAULT_CONNECT_TIMEOUT;
+    /**
+     * The ping interval of WebSocket connection
+     */
+    public long pingInterval;
 
-    public long mReadTimeout = DEFAULT_READ_TIMEOUT;
+    /**
+     * The connect timeout of WebSocket handshake
+     */
+    public long connectTimeout;
 
-    public long mWriteTimeout = DEFAULT_WRITE_TIMEOUT;
+    /**
+     * The read timeout of WebSocket connection
+     */
+    public long readTimeout;
 
-    public RetryStrategy mRetryStrategy;
+    /**
+     * The write timeout of WebSocket connection. (not must use in some WebSocket client)
+     */
+    public long writeTimeout;
 
-    public HashMap<String, String> mHeaders = new HashMap<>();
+    /**
+     * Retry strategy when reconnection
+     */
+    public RetryStrategy retryStrategy;
 
-    public String mUrl = "";
+    /**
+     * Event listener of {@link WebSocket}
+     */
+    public EventListener eventListener;
 
-    private WsConfig() {
+    private WsConfig(Builder builder) {
+        this.url = builder.url;
+        this.httpHeaders = builder.httpHeaders;
+        this.websocket = builder.websocket;
+        this.pingInterval = builder.pingInterval;
+        this.connectTimeout = builder.connectTimeout;
+        this.readTimeout = builder.readTimeout;
+        this.retryStrategy = builder.retryStrategy;
+        this.eventListener = builder.eventListener;
+
+        WsGoLog.DEBUG = builder.debug;
+
+        WsGoLog.d("WsGo init success");
     }
 
     public static class Builder {
 
-        private WsConfig mConfig = new WsConfig();
+        String url;
 
-        public Builder setEventListener(EventListener listener) {
-            this.mConfig.mEventListener = listener;
+        HashMap<String, String> httpHeaders;
+
+        WebSocket websocket;
+
+        long pingInterval = DEFAULT_PING_INTERVAL;
+
+        long connectTimeout = DEFAULT_CONNECT_TIMEOUT;
+
+        long readTimeout = DEFAULT_READ_TIMEOUT;
+
+        long writeTimeout = DEFAULT_WRITE_TIMEOUT;
+
+        RetryStrategy retryStrategy;
+
+        EventListener eventListener;
+
+        boolean debug = true;
+
+        public Builder setUrl(String url) {
+            this.url = url;
             return this;
         }
 
-        public Builder setRetryStrategy(RetryStrategy retryStrategy) {
-            this.mConfig.mRetryStrategy = retryStrategy;
+        public Builder setHttpHeaders(HashMap<String, String> headers) {
+            this.httpHeaders = headers;
+            return this;
+        }
+
+        public Builder setWebSocket(WebSocket webSocket) {
+            this.websocket = webSocket;
             return this;
         }
 
         public Builder setPingInterval(long pingInterval) {
-            this.mConfig.mPingInterval = pingInterval;
+            this.pingInterval = pingInterval;
             return this;
         }
 
         public Builder setConnectTimeout(long connectTimeout) {
-            this.mConfig.mConnectTimeout = connectTimeout;
+            this.connectTimeout = connectTimeout;
             return this;
         }
 
         public Builder setReadTimeout(long readTimeout) {
-            this.mConfig.mReadTimeout = readTimeout;
+            this.readTimeout = readTimeout;
             return this;
         }
 
         public Builder setWriteTimeout(long writeTimeout) {
-            this.mConfig.mWriteTimeout = writeTimeout;
+            this.writeTimeout = writeTimeout;
             return this;
         }
 
-        public Builder setHeaders(HashMap<String, String> headers) {
-            this.mConfig.mHeaders = headers;
+        public Builder setRetryStrategy(RetryStrategy retryStrategy) {
+            this.retryStrategy = retryStrategy;
             return this;
         }
 
-        public Builder setUrl(String url) {
-            this.mConfig.mUrl = url;
+        public Builder setEventListener(EventListener listener) {
+            this.eventListener = listener;
+            return this;
+        }
+
+        /**
+         * Debug mode
+         * true(default) - print log
+         * false - print nothing
+         */
+        public Builder debugMode(boolean debug) {
+            this.debug = debug;
             return this;
         }
 
         public WsConfig build() {
-            if (mConfig.mWebSocket == null) {
-                mConfig.mWebSocket = new OkWebSocket.Factory().create();
+            if (url == null) {
+                throw new IllegalStateException("url == null");
             }
-            return mConfig;
+
+            if (httpHeaders == null) {
+                httpHeaders = new HashMap<>();
+            }
+
+            if (websocket == null) {
+                websocket = new OkWebSocket.Factory().create();
+            }
+
+            if (retryStrategy == null) {
+                retryStrategy = new DefaultRetryStrategy();
+            }
+
+            return new WsConfig(this);
         }
     }
 }

@@ -1,11 +1,14 @@
 package com.gnepux.wsgo.dispatch.queue;
 
 import com.gnepux.wsgo.dispatch.message.Message;
+import com.gnepux.wsgo.util.WsGoLog;
 
 import java.util.concurrent.DelayQueue;
 
 /**
- * Interface of Message Queue
+ * WsGo Message Queue
+ *
+ * @author gnepux
  */
 public class MessageQueue<E extends Message> implements Queue<E> {
 
@@ -27,7 +30,7 @@ public class MessageQueue<E extends Message> implements Queue<E> {
         try {
             return queue.take();
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            WsGoLog.d("message queue loop stop");
             return null;
         }
     }

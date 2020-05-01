@@ -2,6 +2,9 @@ package com.gnepux.wsgo.dispatch.message.command;
 
 import java.util.concurrent.TimeUnit;
 
+/**
+ * @author gnepux
+ */
 public class ChangePingCmd extends Command {
 
     private long time;

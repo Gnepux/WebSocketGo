@@ -1,5 +1,10 @@
 package com.gnepux.wsgo.dispatch.queue;
 
+/**
+ * Basic operation of a queue
+ *
+ * @author gnepux
+ */
 public interface Queue<E> {
 
     /**
@@ -15,6 +20,6 @@ public interface Queue<E> {
     /**
      * poll a message
      */
-    E poll();
+    E poll() throws InterruptedException;
 
 }

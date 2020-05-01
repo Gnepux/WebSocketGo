@@ -1,12 +1,8 @@
 package com.gnepux.wsgo.protocol;
 
-import android.util.Log;
-
 import com.gnepux.wsgo.WsConfig;
 import com.gnepux.wsgo.constant.Constants;
 import com.gnepux.wsgo.dispatch.dispatcher.Dispatcher;
-import com.gnepux.wsgo.dispatch.message.command.Command;
-import com.gnepux.wsgo.dispatch.message.command.ReconnectCmd;
 import com.gnepux.wsgo.dispatch.message.event.Event;
 import com.gnepux.wsgo.dispatch.message.event.OnCloseEvent;
 import com.gnepux.wsgo.dispatch.message.event.OnConnectEvent;
@@ -14,14 +10,15 @@ import com.gnepux.wsgo.dispatch.message.event.OnDisConnectEvent;
 import com.gnepux.wsgo.dispatch.message.event.OnMessageEvent;
 import com.gnepux.wsgo.dispatch.message.event.OnRetryEvent;
 import com.gnepux.wsgo.dispatch.message.event.OnSendEvent;
-import com.gnepux.wsgo.retry.DefaultRetryStategy;
-import com.gnepux.wsgo.retry.RetryStrategy;
+import com.gnepux.wsgo.util.WsGoLog;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Manage WebSocket channel's connect、disconnect and reconnect etc
+ * Manage WebSocket channel's connect/disconnect/reconnect etc.
+ *
+ * @author gnepux
  */
 public class ChannelManager implements ChannelCallback {
 
@@ -36,24 +33,27 @@ public class ChannelManager implements ChannelCallback {
 
     private WebSocket mWebSocket;
 
-    private STATE state;
-
-    private Dispatcher<Command> commandDispatcher;
+    private volatile STATE state = STATE.IDLE;
 
     private Dispatcher<Event> eventDispatcher;
 
-    private int retryCount = 0;
+    private volatile long retryCount = 0;
 
     private WsConfig mConfig;
 
-    private CountDownLatch mLatch;
+    private CountDownLatch latch;
 
-    public ChannelManager(Dispatcher<Command> commandDispatcher, Dispatcher<Event> eventDispatcher) {
-        this.commandDispatcher = commandDispatcher;
+    private volatile long lastRetryTimeStamp;
+
+    private volatile long lastDelayTime;
+
+    public ChannelManager(Dispatcher<Event> eventDispatcher) {
         this.eventDispatcher = eventDispatcher;
     }
 
-    public void connect(WebSocket webSocket, WsConfig config) {
+    public void connect(WebSocket webSocket, WsConfig config, boolean reConnect) {
+        WsGoLog.d("[connect] reConnect=[" + reConnect + "]");
+
         // channel is connected already
         if (state == STATE.CONNECTED) {
             return;
@@ -63,14 +63,18 @@ public class ChannelManager implements ChannelCallback {
             return;
         }
 
-        mLatch = new CountDownLatch(1);
+        latch = new CountDownLatch(1);
 
         state = STATE.CONNECTING;
 
         try {
             mWebSocket = webSocket;
             mConfig = config;
-            webSocket.connect(config, this);
+            if (reConnect) {
+                webSocket.reconnect(config, this);
+            } else {
+                webSocket.connect(config, this);
+            }
         } catch (Exception e) {
             // some exception due to the code error
             e.printStackTrace();
@@ -78,20 +82,26 @@ public class ChannelManager implements ChannelCallback {
         }
 
         try {
-            mLatch.await(config.mConnectTimeout, TimeUnit.MILLISECONDS);
+            latch.await(config.connectTimeout, TimeUnit.MILLISECONDS);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
     }
 
-    public void reconnect() {
+    public void reconnect(long retryCount) {
+        WsGoLog.d("[reconnect] retryCount=[" + retryCount + "]");
+
         if (state == STATE.CONNECTED) {
+            WsGoLog.d("[reconnect] WsGo has been connected. skip");
             return;
         }
-        connect(mWebSocket, mConfig);
+
+        connect(mWebSocket, mConfig, true);
     }
 
     public void disconnect(int code, String reason) {
+        WsGoLog.d("[disconnect] code=[" + code + "] reason=[" + reason + "]");
+
         if (mWebSocket != null) {
             mWebSocket.disconnect(code, reason);
             mWebSocket = null;
@@ -99,24 +109,28 @@ public class ChannelManager implements ChannelCallback {
     }
 
     public void changePingInterval(long time, TimeUnit unit) {
+        WsGoLog.d("[changePingInterval] time=[" + time + "] unit=[" + unit.toString() + "]");
+
         if (mWebSocket != null) {
             mWebSocket.changePingInterval(time, unit);
         }
     }
 
     public void send(String text) {
+        WsGoLog.d("[send] " + text);
+
         boolean success = false;
 
         if (mWebSocket != null) {
             success = mWebSocket.send(text);
         }
 
-        eventDispatcher.sendMessage(new OnSendEvent(success));
+        eventDispatcher.sendMessage(new OnSendEvent(success, text));
     }
 
     @Override
     public void onConnect(WebSocket webSocket) {
-        Log.e("xupeng", "[onConnect]");
+        WsGoLog.d("[onConnect] connect success");
         eventDispatcher.sendMessage(new OnConnectEvent());
 
         state = STATE.CONNECTED;
@@ -124,28 +138,28 @@ public class ChannelManager implements ChannelCallback {
         retryCount = 0;
         mWebSocket = webSocket;
 
-        mLatch.countDown();
+        latch.countDown();
     }
 
     @Override
     public void onMessage(String text) {
-        Log.e("xupeng", "[onMessage]" + text);
+        WsGoLog.d("[onMessage] " + text);
         eventDispatcher.sendMessage(new OnMessageEvent(text));
     }
 
     @Override
     public void onClose(int code, String reason) {
-        Log.e("xupeng", "[onClose]" + code + ":" + reason);
+        WsGoLog.d("[onClose] code=[" + code + "] reason=[" + reason + "]");
         eventDispatcher.sendMessage(new OnCloseEvent());
 
         state = STATE.IDLE;
 
         // Not normally close, need to reconnect
         if (code != Constants.CODE_NORMAL_CLOSE) {
-            sendReconnectMsg(++retryCount);
+            sendReconnectMsg();
         }
 
-        mLatch.countDown();
+        latch.countDown();
     }
 
     /**
@@ -155,28 +169,34 @@ public class ChannelManager implements ChannelCallback {
      */
     @Override
     public void onDisconnect(Throwable t) {
-        Log.e("xupeng", "[onDisconnect]");
-        t.printStackTrace();
+        WsGoLog.d("[onDisconnect] " + t.getMessage());
+
         eventDispatcher.sendMessage(new OnDisConnectEvent());
 
         state = STATE.IDLE;
-        sendReconnectMsg(++retryCount);
+        sendReconnectMsg();
 
-        mLatch.countDown();
+        latch.countDown();
     }
 
-    private void sendReconnectMsg(int retryCount) {
-        RetryStrategy retryStrategy = mConfig.mRetryStrategy;
-        if (retryStrategy == null) {
-            retryStrategy = new DefaultRetryStategy();
+    private synchronized void sendReconnectMsg() {
+        // Skip frequent retry request.
+        // Because some WebSocket libraries could call onClose or onDisconnect many times when disconnect,
+        // it may cause 2^ times retry.
+        // I DO NOT say he is Java WebSocket :)
+        long retryTime = System.currentTimeMillis();
+        if (retryTime - lastRetryTimeStamp < lastDelayTime) {
+            WsGoLog.d("retry request too frequent, skip");
+            return;
         }
 
-        long delay = retryStrategy.onRetry(retryCount);
-        String retryInfo = "retry after " + delay + "ms";
-        Log.e("xupeng", retryInfo);
-        eventDispatcher.sendMessage(new OnRetryEvent(retryCount, delay));
+        lastRetryTimeStamp = retryTime;
+        lastDelayTime = mConfig.retryStrategy.onRetry(retryCount);
 
-        commandDispatcher.sendMessageDelay(new ReconnectCmd(), delay);
+        WsGoLog.d(retryCount + " times reconnect try after " + lastDelayTime + "ms");
+
+        Event onRetry = new OnRetryEvent(retryCount++, lastDelayTime);
+        eventDispatcher.sendMessage(onRetry);
     }
 
 }

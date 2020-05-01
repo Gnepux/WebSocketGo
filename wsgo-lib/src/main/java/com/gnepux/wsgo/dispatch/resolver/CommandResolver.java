@@ -16,12 +16,17 @@ import static com.gnepux.wsgo.dispatch.message.command.Command.DISCONNECT;
 import static com.gnepux.wsgo.dispatch.message.command.Command.RECONNECT;
 import static com.gnepux.wsgo.dispatch.message.command.Command.SEND;
 
+/**
+ * Resolver for command type message.
+ *
+ * @author gnepux
+ */
 public class CommandResolver implements Resolver<Command> {
 
-    ChannelManager mChannelManager;
+    private ChannelManager mChannelManager;
 
-    public CommandResolver(Dispatcher<Command> commandDispatcher, Dispatcher<Event> eventDispatcher) {
-        mChannelManager = new ChannelManager(commandDispatcher, eventDispatcher);
+    public CommandResolver(Dispatcher<Event> eventDispatcher) {
+        mChannelManager = new ChannelManager(eventDispatcher);
     }
 
     @Override
@@ -47,23 +52,23 @@ public class CommandResolver implements Resolver<Command> {
         }
     }
 
-    void handleConnect(ConnectCmd command) {
-        mChannelManager.connect(command.getConfig().mWebSocket, command.getConfig());
+    private void handleConnect(ConnectCmd command) {
+        mChannelManager.connect(command.getConfig().websocket, command.getConfig(), false);
     }
 
-    void handleReconnect(ReconnectCmd command) {
-        mChannelManager.reconnect();
+    private void handleReconnect(ReconnectCmd command) {
+        mChannelManager.reconnect(command.getRetryCount());
     }
 
-    void handleDisconnect(DisconnectCmd command) {
+    private void handleDisconnect(DisconnectCmd command) {
         mChannelManager.disconnect(command.getCode(), command.getReason());
     }
 
-    void handleChangePing(ChangePingCmd command) {
+    private void handleChangePing(ChangePingCmd command) {
         mChannelManager.changePingInterval(command.getTime(), command.getUnit());
     }
 
-    void handleSend(SendCmd command) {
+    private void handleSend(SendCmd command) {
         mChannelManager.send(command.getText());
     }
 }

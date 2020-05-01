@@ -4,7 +4,9 @@ import com.gnepux.wsgo.dispatch.message.Message;
 import com.gnepux.wsgo.dispatch.queue.MessageQueue;
 
 /**
- * Implementation of Producer Thread
+ * Producer thread.
+ *
+ * @author gnepux
  */
 public class ProducerThread<E extends Message> extends Thread implements Producer<E> {
 
@@ -27,6 +29,7 @@ public class ProducerThread<E extends Message> extends Thread implements Produce
 
     public void shutdown() {
         isAlive = false;
+        interrupt();
     }
 
     @Override

@@ -1,8 +1,11 @@
 package com.gnepux.wsgo.retry;
 
-public class DefaultRetryStategy implements RetryStrategy {
+/**
+ * @author gnepux
+ */
+public class DefaultRetryStrategy implements RetryStrategy {
     @Override
-    public long onRetry(int retryCount) {
+    public long onRetry(long retryCount) {
         long delay;
         if (retryCount < 2) {
             delay = 0;

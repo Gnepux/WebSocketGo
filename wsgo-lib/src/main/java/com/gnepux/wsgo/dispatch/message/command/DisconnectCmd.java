@@ -1,5 +1,8 @@
 package com.gnepux.wsgo.dispatch.message.command;
 
+/**
+ * @author gnepux
+ */
 public class DisconnectCmd extends Command {
 
     private int code;

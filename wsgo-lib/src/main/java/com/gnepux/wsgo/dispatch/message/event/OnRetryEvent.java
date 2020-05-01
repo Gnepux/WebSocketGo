@@ -1,22 +1,25 @@
 package com.gnepux.wsgo.dispatch.message.event;
 
+/**
+ * @author gnepux
+ */
 public class OnRetryEvent extends Event {
 
-    private int retryCount;
+    private long retryCount;
 
     private long delayMillSec;
 
-    public OnRetryEvent(int retryCount, long delayMillSec) {
+    public OnRetryEvent(long retryCount, long delayMillSec) {
         super(ON_RETRY);
         this.retryCount = retryCount;
         this.delayMillSec = delayMillSec;
     }
 
-    public int getRetryCount() {
+    public long getRetryCount() {
         return retryCount;
     }
 
-    public void setRetryCount(int retryCount) {
+    public void setRetryCount(long retryCount) {
         this.retryCount = retryCount;
     }
 

@@ -2,6 +2,9 @@ package com.gnepux.wsgo.dispatch.message.command;
 
 import com.gnepux.wsgo.dispatch.message.Message;
 
+/**
+ * @author gnepux
+ */
 public class Command extends Message {
 
     private static final int BASE = 1;
@@ -17,7 +20,7 @@ public class Command extends Message {
      */
     private int cmd;
 
-    public Command(int code) {
+    Command(int code) {
         this.cmd = code;
     }
 
