@@ -14,6 +14,10 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * WsGo client for Java WebSocket
+ * @author gnepux
+ */
 public class JWebSocket implements WebSocket {
 
     private WebSocketClient client;

@@ -28,20 +28,18 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 }
 
-def siteUrl = 'https://github.com/Gnepux/WsGo'
-def gitUrl = 'https://github.com/Gnepux/WsGo.git'
 group = "com.gnepux"
 def libName = "WsGo"
-version = "1.0.0"
+version = "1.0.1"
 
 install {
     repositories.mavenInstaller {
         // This generates POM.xml with proper parameters
         pom {
             project {
-                packaging 'aar'
+                packaging 'jar'
                 name libName
-                url siteUrl
+                url SITE_URL
                 licenses {
                     license {
                         name 'The Apache Software License, Version 2.0'
@@ -56,9 +54,9 @@ install {
                     }
                 }
                 scm {
-                    connection gitUrl
-                    developerConnection gitUrl
-                    url siteUrl
+                    connection GIT_URL
+                    developerConnection GIT_URL
+                    url SITE_URL
                 }
             }
         }
@@ -110,8 +108,8 @@ bintray {
     pkg {
         repo = "maven"
         name = libName                // project name in jcenter
-        websiteUrl = siteUrl
-        vcsUrl = gitUrl
+        websiteUrl = SITE_URL
+        vcsUrl = GIT_URL
         licenses = ["Apache-2.0"]
         publish = true
     }

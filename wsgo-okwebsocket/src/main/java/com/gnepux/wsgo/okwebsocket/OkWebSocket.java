@@ -18,6 +18,10 @@ import okhttp3.WebSocketListener;
 import okhttp3.internal.Util;
 import okhttp3.internal.ws.RealWebSocket;
 
+/**
+ * WsGo client for OkHttp
+ * @author gnepux
+ */
 public class OkWebSocket implements WebSocket {
 
     private okhttp3.WebSocket mWebSocket;

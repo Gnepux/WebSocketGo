@@ -13,6 +13,9 @@ import javax.net.ssl.SSLSocketFactory;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 
+/**
+ * @author gnepux
+ */
 public class OkUtils {
 
     /**
