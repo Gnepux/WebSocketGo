@@ -26,6 +26,6 @@ android {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
-    implementation project(path: ':wsgo-lib')
+    implementation project(path: ':wsgo')
     implementation 'com.squareup.okhttp3:okhttp:3.10.0'
 }

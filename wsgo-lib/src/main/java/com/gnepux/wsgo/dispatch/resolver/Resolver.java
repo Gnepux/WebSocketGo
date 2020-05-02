@@ -11,6 +11,7 @@ public interface Resolver<E extends Message> {
 
     /**
      * Resolve the message
+     * @param e message
      */
     void resolve(E e);
 

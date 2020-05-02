@@ -146,6 +146,7 @@ public class WsConfig {
 
         /**
          * Debug mode
+         * @param debug
          * true(default) - print log
          * false - print nothing
          */

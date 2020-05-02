@@ -4,9 +4,6 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.ViewSwitcher;
@@ -20,16 +17,17 @@ import com.gnepux.wsgo.retry.RetryStrategy;
 import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
 
+import static com.gnepux.ws.UiHelper.addBtn;
+import static com.gnepux.ws.UiHelper.addEditText;
+
+/**
+ * @author gnepux
+ */
 public class MainActivity extends Activity {
 
-    private String pushUrl = "wss://push.myiot360.com:48000/push";
+    private static final String DEFAULT_URL = "wss://";
 
-    private HashMap<String, String> headerMap = new HashMap<String, String>() {
-        {
-            put("x-zypush-id", "e15cdd187f300af13d05e4034afc7e83c6e5bd5f");
-            put("x-zhsq-app", "user");
-            put("x-zhsq-platform", "android");
-        }
+    private static final HashMap<String, String> DEFAULT_HEADER = new HashMap<String, String>() {
     };
 
     private TextView logTextView;
@@ -46,50 +44,56 @@ public class MainActivity extends Activity {
         setContentView(R.layout.activity_main);
 
         switcher = findViewById(R.id.view_switcher);
+
         switcher.setDisplayedChild(0);
 
         scrollView = findViewById(R.id.scroll_view);
+
         logTextView = findViewById(R.id.tv_log);
 
-        addBtn(0, "WsGo init", new View.OnClickListener() {
+        final TextView urlTv = addEditText(this, 0, DEFAULT_URL);
+
+        addBtn(this, 0, "WsGo init", new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                init();
+                init(urlTv.getText().toString());
 
                 printLog("WsGo init");
                 switcher.setDisplayedChild(1);
             }
         });
 
-        addBtn(1, "connect", new View.OnClickListener() {
+        addBtn(this, 1, "connect", new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 WsGo.getInstance().connect();
             }
         });
 
-        addBtn(1, "send text", new View.OnClickListener() {
+        final TextView sendTextTv = addEditText(this, 1, "hello from WsGo");
+
+        addBtn(this, 1, "send text", new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                WsGo.getInstance().send("hello from WsGo");
+                WsGo.getInstance().send(sendTextTv.getText().toString());
             }
         });
 
-        addBtn(1, "disconnect", new View.OnClickListener() {
+        addBtn(this, 1, "disconnect", new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 WsGo.getInstance().disconnectNormal("close");
             }
         });
 
-        addBtn(1, "change ping interval", new View.OnClickListener() {
+        addBtn(this, 1, "change ping interval", new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 WsGo.getInstance().changePingInterval(10, TimeUnit.SECONDS);
             }
         });
 
-        addBtn(1, "destroy", new View.OnClickListener() {
+        addBtn(this, 1, "destroy", new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 WsGo.getInstance().destroyInstance();
@@ -100,14 +104,16 @@ public class MainActivity extends Activity {
         });
     }
 
-    private void init() {
+    private void init(String url) {
         WsConfig config = new WsConfig.Builder()
                 .debugMode(true)
-                .setUrl(pushUrl)
-                .setHttpHeaders(headerMap)
-                .setConnectTimeout(10 * 1000L)
-                .setPingInterval(10 * 1000L)
+                .setUrl(url)
+                .setHttpHeaders(DEFAULT_HEADER)
                 .setWebSocket(OkWebSocket.create())
+                .setConnectTimeout(10 * 1000L)
+                .setReadTimeout(10 * 1000L)
+                .setWriteTimeout(10 * 1000L)
+                .setPingInterval(10 * 1000L)
                 .setRetryStrategy(new RetryStrategy() {
                     @Override
                     public long onRetry(long retryCount) {
@@ -154,15 +160,6 @@ public class MainActivity extends Activity {
                 .build();
 
         WsGo.init(config);
-    }
-
-    private void addBtn(int id, String text, View.OnClickListener listener) {
-        LinearLayout linearLayout = findViewById(id == 0 ? R.id.view0 : R.id.view1);
-        Button connect = new Button(this);
-        connect.setText(text);
-        connect.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
-        connect.setOnClickListener(listener);
-        linearLayout.addView(connect);
     }
 
     private void printLog(final String log) {

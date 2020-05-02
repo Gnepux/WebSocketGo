@@ -21,7 +21,7 @@ android {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
-    implementation project(path: ':wsgo-lib')
+    implementation project(path: ':wsgo')
     implementation project(path: ':wsgo-okwebsocket')
     implementation project(path: ':wsgo-jwebsocket')
 }

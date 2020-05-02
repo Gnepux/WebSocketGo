@@ -1,2 +1,4 @@
-include ':app', ':wsgo-lib', ':wsgo-okwebsocket', ':wsgo-jwebsocket'
+include ':app', ':wsgo', ':wsgo-okwebsocket', ':wsgo-jwebsocket'
 rootProject.name='ws-go'
+
+project(":wsgo").projectDir = file("wsgo-lib")

@@ -82,6 +82,8 @@ public class WsGo {
      * Need to call {@link #init(WsConfig)} if want to use WsGo again.
      */
     public void destroyInstance() {
+        disconnectNormal("WsGo destroy");
+
         commandDispatcher.stop();
         eventDispatcher.stop();
 
@@ -101,6 +103,9 @@ public class WsGo {
 
     /**
      * Disconnect the WebSocket connection.
+     *
+     * @param code   disconnect code. Should between CODE_VALID_MAX and CODE_VALID_MAX
+     * @param reason disconnect reason
      */
     public void disconnect(int code, String reason) {
         if (code < CODE_VALID_MIN || code > CODE_VALID_MAX) {
@@ -111,6 +116,8 @@ public class WsGo {
 
     /**
      * Disconnect with a normal code.
+     *
+     * @param reason disconnect reason
      */
     public void disconnectNormal(String reason) {
         disconnect(CODE_NORMAL_CLOSE, reason);
@@ -118,6 +125,9 @@ public class WsGo {
 
     /**
      * Change ping interval.
+     *
+     * @param interval interval
+     * @param unit     TimeUnit
      */
     public void changePingInterval(long interval, TimeUnit unit) {
         commandDispatcher.sendMessage(new ChangePingCmd(interval, unit));
@@ -125,6 +135,8 @@ public class WsGo {
 
     /**
      * Send a text.
+     *
+     * @param text the text want to send
      */
     public void send(String text) {
         commandDispatcher.sendMessage(new SendCmd(text));

@@ -138,7 +138,6 @@ public interface EventListener {
 
 ### 4. Data Flow
 
-WsGo use two Message Queue for sending Command & Event.
-
+![dataflow][https://raw.githubusercontent.com/Gnepux/WsGo/master/dataflow.png]
 
 
