@@ -10,11 +10,11 @@ WsGo is a WebSocket channel management.
 ## Download
 
 ```groovy
-implementation 'com.gnepux:wsgo:1.0.0'
+implementation 'com.gnepux:wsgo:1.0.2'
 // use okhttp
-implementation 'com.gnepux:wsgo-okwebsocket:1.0.0'
+implementation 'com.gnepux:wsgo-okwebsocket:1.0.1'
 // use java websocket
-implementation 'com.gnepux:wsgo-jwebsocket:1.0.0'
+implementation 'com.gnepux:wsgo-jwebsocket:1.0.1'
 ```
 
 ## Usage
