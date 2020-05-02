@@ -21,7 +21,7 @@ implementation 'com.gnepux:wsgo-jwebsocket:1.0.1'
 ```
 
 ### Maven
-```
+```xml
 <dependency>
     <groupId>com.gnepux</groupId>
     <artifactId>wsgo</artifactId>
@@ -93,13 +93,13 @@ WsGo.getInstance().destroyInstance();
 
 WsGo has already support OkHttp and Java WebSocket.
 
-* for OkHttp
+* for OkHttp (wsgo-okwebsocket)
 
 ```java
 setWebSocket(OkWebSocket.create());
 ```
 
-* for Java WebSocket
+* for Java WebSocket (wsgo-jwebsocket)
 
 ```java
 setWebSocket(JWebSocket.create());
