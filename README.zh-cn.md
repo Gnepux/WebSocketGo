@@ -1,15 +1,15 @@
-## Introduction
+## 简介
 
-[中文版](https://github.com/Gnepux/WsGo/blob/master/README.zh-cn.md)
+[English Version](https://github.com/Gnepux/WsGo/blob/master/README.md)
 
-WsGo is a java library, it can be used to manage the WebSocket channel.
+WsGo是一个Java库，可以用来帮助管理WebSocket的连接。
 
-1. It helps you to connect, disconnect, auto reconnect, change ping interval.
-2. Support OkHttp、Java WebSocket and any other custom WebSocket library.
-3. Both Android and pure Java platform are supported.
-4. Thread safe.
+1. 可以用来进行连接、断连、自动重连、调整心跳。
+2. 支持OkHttp、Java WebSocket和其他自定义的WebSocket库。
+3. 支持Android和纯Java环境。
+4. 线程安全。
 
-## Download
+## 下载
 
 ### Gradle
 ```groovy
@@ -46,22 +46,22 @@ implementation 'com.gnepux:wsgo-jwebsocket:1.0.1'
 </dependency>
 ```
 
-## Usage
+## 使用方法
 
-### 1. Init
+### 1. 初始化
 
 ```java
 WsConfig config = new WsConfig.Builder()
-                .debugMode(true)    // true to print log
+                .debugMode(true)    // debug模式则会打印日志
                 .setUrl(pushUrl)    // ws url
                 .setHttpHeaders(headerMap)  // http headers
                 .setConnectTimeout(10 * 1000L)  // connect timeout
                 .setReadTimeout(10 * 1000L)     // read timeout
                 .setWriteTimeout(10 * 1000L)    // write timeout
-                .setPingInterval(10 * 1000L)    // initial ping interval
-                .setWebSocket(OkWebSocket.create()) // websocket client
-                .setRetryStrategy(retryStrategy)    // retry count and delay time strategy
-                .setEventListener(eventListener)    // event listener
+                .setPingInterval(10 * 1000L)    // 初始心跳间隔
+                .setWebSocket(OkWebSocket.create()) // websocket客户端
+                .setRetryStrategy(retryStrategy)    // 重试策略
+                .setEventListener(eventListener)    // 事件监听
                 .build();
 
 WsGo.init(config);
@@ -87,11 +87,11 @@ WsGo.getInstance().changePingInterval(10, TimeUnit.SECONDS);
 WsGo.getInstance().destroyInstance();
 ```
 
-### 3. More about WsConfig
+### 3. WsConfig的更多配置
 
 #### 3.1 setWebSocket(WebSocket socket)
 
-WsGo has already support OkHttp and Java WebSocket.
+WsGo 已经内置支持OkHttp and Java WebSocket.
 
 * for OkHttp
 
@@ -105,7 +105,7 @@ setWebSocket(OkWebSocket.create());
 setWebSocket(JWebSocket.create());
 ```
 
-If you want to use any other WebSocket client. Implementation the `WebSocket` interface and pass the result to `ChannelCallback`, then WsGo will help you manage the channel.
+如果你需要使用其他的WebSocket库或自定义客户端，只需要实现一个`WebSocket`接口，将对应结果传递给`ChannelCallback`即可。剩下的连接管理，WsGo会帮你完成。
 
 ```java
 public interface WebSocket {
@@ -123,9 +123,9 @@ public interface WebSocket {
 
 #### 3.2 setRetryStrategy(RetryStrategy retryStrategy)
 
-WsGo will auto reconnect if the channel disconnect abnormally. The RetryStrategy means the relationship of retry count and retry delay time.
+对于非正常断开，WsGo会自动重连。RetryStrategy指的是重连次数和延时的关系。
 
-WsGo has a DefaultRetryStrategy inner, if you want to control it by yourself, you can implementation the `RetryStrategy` interface.
+WsGo默认有一个DefaultRetryStrategy，如果你需要自己调整，实现`RetryStrategy`接口里的`onRetry`方法即可。
 
 ```java
 public interface RetryStrategy {
@@ -144,7 +144,7 @@ public interface RetryStrategy {
 
 #### 3.3 setEventListener(EventListener eventListener)
 
-Add an EventListener of WsGo, the callback runs in a different thread to the calling thread. You need to switch thread if needed.
+添加事件回调。需要注意，回调在WsGo自己创建的一个线程中运行，不在调用线程中。如有必要，需要在会调用手动切换线程。
 
 ```java
 public interface EventListener {
@@ -164,7 +164,7 @@ public interface EventListener {
 }
 ```
 
-### 4. Data Flow
+### 4. 数据流
 
 ![dataflow](https://github.com/Gnepux/WsGo/raw/master/dataflow.png)
 
