@@ -49,13 +49,15 @@ public class WsGo {
 
         commandDispatcher.loop("command", commandResolver);
         eventDispatcher.loop("event", eventResolver);
+
+        WsGoLog.d("WsGo init success");
     }
 
     private static volatile WsGo sInstance;
 
     public synchronized static void init(WsConfig config) {
         if (config == null) {
-            WsGoLog.e("WsGo init failed: config can not be null");
+            WsGoLog.d("WsGo init failed: config can not be null");
             return;
         }
 

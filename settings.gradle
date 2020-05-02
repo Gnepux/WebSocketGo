@@ -1,2 +1,2 @@
-include ':app', ':wsgo-lib'
+include ':app', ':wsgo-lib', ':wsgo-okwebsocket', ':wsgo-jwebsocket'
 rootProject.name='ws-go'

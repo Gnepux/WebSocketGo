@@ -1,7 +1,6 @@
 package com.gnepux.wsgo;
 
 import com.gnepux.wsgo.protocol.WebSocket;
-import com.gnepux.wsgo.protocol.okhttp.OkWebSocket;
 import com.gnepux.wsgo.retry.DefaultRetryStrategy;
 import com.gnepux.wsgo.retry.RetryStrategy;
 import com.gnepux.wsgo.util.WsGoLog;
@@ -76,8 +75,6 @@ public class WsConfig {
         this.eventListener = builder.eventListener;
 
         WsGoLog.DEBUG = builder.debug;
-
-        WsGoLog.d("WsGo init success");
     }
 
     public static class Builder {
@@ -162,12 +159,12 @@ public class WsConfig {
                 throw new IllegalStateException("url == null");
             }
 
-            if (httpHeaders == null) {
-                httpHeaders = new HashMap<>();
+            if (websocket == null) {
+                throw new IllegalStateException("websocket == null");
             }
 
-            if (websocket == null) {
-                websocket = new OkWebSocket.Factory().create();
+            if (httpHeaders == null) {
+                httpHeaders = new HashMap<>();
             }
 
             if (retryStrategy == null) {

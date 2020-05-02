@@ -7,14 +7,14 @@ public interface EventListener {
 
     void onConnect();
 
-    void onDisConnect();
+    void onDisConnect(Throwable throwable);
 
-    void onClose();
+    void onClose(int code, String reason);
 
     void onMessage(String text);
 
-    void onRetry(long retryCount, long delayMillSec);
+    void onReconnect(long retryCount, long delayMillSec);
 
-    void onSend(boolean success);
+    void onSend(String text, boolean success);
 
 }

@@ -150,7 +150,7 @@ public class ChannelManager implements ChannelCallback {
     @Override
     public void onClose(int code, String reason) {
         WsGoLog.d("[onClose] code=[" + code + "] reason=[" + reason + "]");
-        eventDispatcher.sendMessage(new OnCloseEvent());
+        eventDispatcher.sendMessage(new OnCloseEvent(code, reason));
 
         state = STATE.IDLE;
 
@@ -171,7 +171,7 @@ public class ChannelManager implements ChannelCallback {
     public void onDisconnect(Throwable t) {
         WsGoLog.d("[onDisconnect] " + t.getMessage());
 
-        eventDispatcher.sendMessage(new OnDisConnectEvent());
+        eventDispatcher.sendMessage(new OnDisConnectEvent(t));
 
         state = STATE.IDLE;
         sendReconnectMsg();
