@@ -166,7 +166,7 @@ public interface EventListener {
 
 ### 4. Data Flow
 
-![dataflow](https://github.com/Gnepux/WsGo/raw/master/dataflow.png)
+![dataflow](https://user-gold-cdn.xitu.io/2020/7/4/173162590145e242?imageView2/0/w/1280/h/960/format/webp/ignore-error/1)
 
 ### 5. License
 
