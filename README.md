@@ -1,6 +1,7 @@
 ## Introduction
 
 [中文版](https://github.com/Gnepux/WsGo/blob/master/README.zh-cn.md)
+
 [Background] (https://juejin.im/post/5eff3c776fb9a07e662344ff)
 
 WsGo is a java library, it can be used to manage the WebSocket channel.
